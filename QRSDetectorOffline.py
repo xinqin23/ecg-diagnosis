@@ -335,11 +335,19 @@ if __name__ == "__main__":
     print(tools.get_heart_rate(rpeaks, sampling_rate=500))
     print(qrs_detector.ecg_data_detected)
 
+
     ecgs = qrs_detector.ecg_data_detected
+    rpeaks = qrs_detector.qrs_peaks_indices
+    period = qrs_detector.refractory_period
+
+    peaks = qrs_detector.detected_peaks_indices
+    data = ecgs[:, 11][int(rpeaks[0] -  period/2 ): int(rpeaks[0] +  period /2)]
+    # data = ecgs[:, 11][int(rpeaks[1] - 2* period ): int(rpeaks[1] +2 * period)]
+
     # for e in ecgs:
     #     print(e)
     #     plt.plot(e)
-    plt.plot(ecgs[0])
+    plt.plot(data)
 
-    plt.savefig('ecgs1.png')
+    plt.savefig('qrs11.png')
     plt.show()
