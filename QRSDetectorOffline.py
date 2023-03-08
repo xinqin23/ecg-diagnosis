@@ -328,8 +328,18 @@ class QRSDetectorOffline(object):
 
 
 if __name__ == "__main__":
-    ecg_data, _ = wfdb.rdsamp('data/CPSC/A0002')
+    ecg_data, _ = wfdb.rdsamp('data/CPSC/CPSC/A0002')
     qrs_detector = QRSDetectorOffline(ecg_data, frequency=500, verbose=False)
     rpeaks = qrs_detector.qrs_peaks_indices
     print(rpeaks)
     print(tools.get_heart_rate(rpeaks, sampling_rate=500))
+    print(qrs_detector.ecg_data_detected)
+
+    ecgs = qrs_detector.ecg_data_detected
+    # for e in ecgs:
+    #     print(e)
+    #     plt.plot(e)
+    plt.plot(ecgs[0])
+
+    plt.savefig('ecgs1.png')
+    plt.show()
