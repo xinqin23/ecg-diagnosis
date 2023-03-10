@@ -50,8 +50,11 @@ def gen_reference_csv(data_dir, reference_csv):
             ecgs = qrs_detector.ecg_data_detected   # we cut around the qrs
             rpeaks = qrs_detector.qrs_peaks_indices
             period = qrs_detector.refractory_period
-            data_v6 = ecgs[:, 11][int(rpeaks[0] - period / 2): int( rpeaks[0] + period / 2)]
-            # data_v6=  ecgs[:, 11]
+            # data_v6 = ecgs[:, 11][int(rpeaks[0] - period / 2): int( rpeaks[0] + period / 2)]
+            # data_v6=  ecgs[:, 11]  #todo: 11 or 10 here????
+            # shouldn't here be 10????
+            data_v6 = ecgs[:, 10][int(rpeaks[0] - period / 2): int( rpeaks[0] + period / 2)]
+
 
             # use raw data
             # data_v6 = data[:,11] # V6
