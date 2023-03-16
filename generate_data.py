@@ -42,7 +42,7 @@ def gen_reference_csv(data_dir, reference_csv):
 
         for label in dxs:
             # store_folder = 'data_se_1as_tstep/{}/'.format(label)
-            store_folder = 'qrs_normal_step/{}/'.format(label)
+            store_folder = 'qrs_normal_step_all/{}/'.format(label)
             check_and_make_dir(store_folder)
 
             # detect qrs here
@@ -53,23 +53,27 @@ def gen_reference_csv(data_dir, reference_csv):
             # data_v6 = ecgs[:, 11][int(rpeaks[0] - period / 2): int( rpeaks[0] + period / 2)]
             # data_v6=  ecgs[:, 11]  #todo: 11 or 10 here????
             # shouldn't here be 10????
-            data_v6 = ecgs[:, 10][int(rpeaks[0] - period / 2): int( rpeaks[0] + period / 2)]
+            # data_v6 = ecgs[:, 10][int(rpeaks[0] - period / 2): int( rpeaks[0] + period / 2)]
+            # data_v6 = ecgs[:, 0][int(rpeaks[0] - period / 2): int(rpeaks[0] + period / 2)]
+
+            for pk in range(len(rpeaks)):
+                data_v6 = ecgs[:, 0][int(rpeaks[pk] - period / 2): int( rpeaks[pk] + period / 2)]
 
 
-            # use raw data
-            # data_v6 = data[:,11] # V6
+                # use raw data
+                # data_v6 = data[:,0] # V6
 
-            try:
-                file_name = os.path.join(store_folder, '{}.csv'.format(patient_id[5:]))  # remove 'CPSC\\'
-                timestamp = gen_time_signal(1/sample_rate, len(data_v6))
-                # timestamp = gen_time_signal(1, len(data_v6))
+                try:
+                    file_name = os.path.join(store_folder, '{}_{}.csv'.format(patient_id[5:],pk))  # remove 'CPSC\\'
+                    timestamp = gen_time_signal(1/sample_rate, len(data_v6))
+                    # timestamp = gen_time_signal(1, len(data_v6))
 
-                df = pd.DataFrame({'timestamp': timestamp , 'value': data_v6}) # todo: check sample rate
-                df.to_csv(file_name)
-            except:
-                pass
-            else:
-                no_qrs_detected_num += 1  # for this si
+                    df = pd.DataFrame({'timestamp': timestamp , 'value': data_v6}) # todo: check sample rate
+                    df.to_csv(file_name)
+                except:
+                    pass
+                else:
+                    no_qrs_detected_num += 1  # for this si
 
     print("Number of no QRS Detected: ", no_qrs_detected_num)
 
