@@ -42,7 +42,7 @@ def gen_reference_csv(data_dir, reference_csv):
 
         for label in dxs:
             # store_folder = 'data_se_1as_tstep/{}/'.format(label)
-            store_folder = 'qrs_normal_step_all/{}/'.format(label)
+            store_folder = 'larger_qrs_normal_step_all/{}/'.format(label)
             check_and_make_dir(store_folder)
 
             # detect qrs here
@@ -57,7 +57,12 @@ def gen_reference_csv(data_dir, reference_csv):
             # data_v6 = ecgs[:, 0][int(rpeaks[0] - period / 2): int(rpeaks[0] + period / 2)]
 
             for pk in range(len(rpeaks)):
-                data_v6 = ecgs[:, 0][int(rpeaks[pk] - period / 2): int( rpeaks[pk] + period / 2)]
+                try:
+                    length = rpeaks[pk+1] - rpeaks[pk]
+                except:
+                    length = 2 * period
+                # data_v6 = ecgs[:, 0][int(rpeaks[pk] - period): int( rpeaks[pk] + period)]
+                data_v6 = ecgs[:, 0][int(rpeaks[pk] - length/2): int( rpeaks[pk] + length/2)]
 
 
                 # use raw data
