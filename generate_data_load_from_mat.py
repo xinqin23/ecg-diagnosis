@@ -8,6 +8,8 @@ import argparse
 import os
 from QRSDetectorOffline import QRSDetectorOffline
 
+import scipy.io
+
 def check_and_make_dir(folder_name):  # make the repo
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
@@ -28,7 +30,9 @@ def gen_reference_csv(data_dir, reference_csv):
     no_qrs_detected_num = 0
     for recordpath in recordpaths:
         patient_id = recordpath.split('/')[-1][:-4]
-        data, meta_data = wfdb.rdsamp(recordpath[:-4])
+        data , meta_data = wfdb.rdsamp(recordpath[:-4])
+        # data_temp = scipy.io.loadmat(recordpath[:-3] + 'mat')  # .hea to .mat
+        # data = data_temp['val']
 
         sample_rate = meta_data['fs']
         signal_len = meta_data['sig_len']
@@ -42,7 +46,7 @@ def gen_reference_csv(data_dir, reference_csv):
 
         for label in dxs:
             # store_folder = 'data_se_1as_tstep/{}/'.format(label)
-            store_folder = 'ECG_data_pqrst_2instance/{}/'.format(label)
+            store_folder = 'ECG_data_pqrst_1instance_clean/{}/'.format(label)
             check_and_make_dir(store_folder)
 
             # detect qrs here
@@ -63,8 +67,8 @@ def gen_reference_csv(data_dir, reference_csv):
                     length = rpeaks[pk+1] - rpeaks[pk]
                 except:
                     length = 2 * period
-                # data_v6 = ecgs[:, 0][int(rpeaks[pk] - period): int( rpeaks[pk] + period)]
-                data_v6 = ecgs[:, 0][int(rpeaks[pk] - length/2): int( rpeaks[pk+1] + length/2)]
+                data_v6 = ecgs[:, 0][int(rpeaks[pk] - period): int( rpeaks[pk] + period)]  # one peak
+                # data_v6 = ecgs[:, 0][int(rpeaks[pk] - length/2): int( rpeaks[pk+1] + length/2)] # two peaks
 
 
                 # use raw data
@@ -105,7 +109,7 @@ if __name__ == "__main__":
     }
     classes = ['SNR', 'AF', 'IAVB', 'LBBB', 'RBBB', 'PAC', 'PVC', 'STD', 'STE']
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-dir', type=str, default='data/CPSC/CPSC', help='Directory to dataset')
+    parser.add_argument('--data-dir', type=str, default='data_kuk/CPSC_clean', help='Directory to dataset')
     args = parser.parse_args()
     data_dir = args.data_dir
     reference_csv = os.path.join(data_dir, 'reference.csv')
