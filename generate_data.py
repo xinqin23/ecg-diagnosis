@@ -28,8 +28,10 @@ def gen_reference_csv(data_dir, reference_csv):
     no_qrs_detected_num = 0
     for recordpath in recordpaths:
         patient_id = recordpath.split('/')[-1][:-4]
-        data, meta_data = wfdb.rdsamp(recordpath[:-4])
-
+        try:
+            data, meta_data = wfdb.rdsamp(recordpath[:-4])
+        except:
+            continue
         sample_rate = meta_data['fs']
         signal_len = meta_data['sig_len']
         age = meta_data['comments'][0]
@@ -42,7 +44,7 @@ def gen_reference_csv(data_dir, reference_csv):
 
         for label in dxs:
             # store_folder = 'data_se_1as_tstep/{}/'.format(label)
-            store_folder = 'ECG_data_pqrst_2instance/{}/'.format(label)
+            store_folder = 'ECG_data_pqrst_1instance/{}/{}/'.format(label, patient_id)
             check_and_make_dir(store_folder)
 
             # detect qrs here
@@ -63,15 +65,15 @@ def gen_reference_csv(data_dir, reference_csv):
                     length = rpeaks[pk+1] - rpeaks[pk]
                 except:
                     length = 2 * period
-                # data_v6 = ecgs[:, 0][int(rpeaks[pk] - period): int( rpeaks[pk] + period)]
-                data_v6 = ecgs[:, 0][int(rpeaks[pk] - length/2): int( rpeaks[pk+1] + length/2)]
+                data_v6 = ecgs[:, 0][max(int(rpeaks[pk] - period),0): int( rpeaks[pk] + period)]
+                # data_v6 = ecgs[:, 0][int(rpeaks[pk] - length/2): int( rpeaks[pk+1] + length/2)]
 
 
                 # use raw data
                 # data_v6 = data[:,0] # V6
 
                 try:
-                    file_name = os.path.join(store_folder, '{}_{}.csv'.format(patient_id[5:],pk))  # remove 'CPSC\\'
+                    file_name = os.path.join(store_folder, '{}_{}.csv'.format(patient_id,pk))  # remove 'CPSC\\'
                     timestamp = gen_time_signal(1/sample_rate, len(data_v6))
                     # timestamp = gen_time_signal(1, len(data_v6))
 
@@ -105,7 +107,8 @@ if __name__ == "__main__":
     }
     classes = ['SNR', 'AF', 'IAVB', 'LBBB', 'RBBB', 'PAC', 'PVC', 'STD', 'STE']
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-dir', type=str, default='data/CPSC/CPSC', help='Directory to dataset')
+    # parser.add_argument('--data-dir', type=str, default='data/CPSC/CPSC', help='Directory to dataset')
+    parser.add_argument('--data-dir', type=str, default='data/CPSC', help='Directory to dataset')
     args = parser.parse_args()
     data_dir = args.data_dir
     reference_csv = os.path.join(data_dir, 'reference.csv')
